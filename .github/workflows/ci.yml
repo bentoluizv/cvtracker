@@ -19,6 +19,7 @@ jobs:
       - uses: abatilo/actions-poetry@v3
         with:
           poetry-version: '2.0.1'
+      - name: Install Dependencies
         run: poetry install
       - name: Run Tests
         run: task test
