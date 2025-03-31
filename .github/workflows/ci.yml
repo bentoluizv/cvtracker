@@ -22,4 +22,4 @@ jobs:
       - name: Install Dependencies
         run: poetry install
       - name: Run Tests
-        run: poetry run task test
+        run: pytest
