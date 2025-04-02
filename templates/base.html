@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <script src="{{ url_for('static', path='/htmx.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="min-h-screen max-w-screen bg-gray-100 flex flex-col"></body>
+<header class="p-2 bg-gray-800 text-zinc-200 text-center">
+    <h1>CV Tracker</h1>
+</header>
+<main class="p-2 grow flex flex-col gap-8 items-center justify-evenly">
+    {% block main %}{% endblock %}
+</main>
+<footer class="p-2 bg-gray-800 text-zinc-200 text-center">
+    &copy; Copyright 2025 by <a class="text-blue-400 hover:underline"
+        href="https://www.linkedin.com/in/bentoluizv/">Bento Machado</a>.
+</footer>
+</body>
+
+</html>
