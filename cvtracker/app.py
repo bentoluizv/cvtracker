@@ -16,7 +16,8 @@ app.mount(
 
 templates = Jinja2Templates(directory='templates')
 
-homepage_router = APIRouter(tags=['Tracker API'])
+homepage_router = APIRouter(tags=['Pages'])
+api_router = APIRouter(prefix='/api/v1', tags=['API'])
 
 
 @homepage_router.get('/', response_class=HTMLResponse)
@@ -43,6 +44,7 @@ async def index(request: Request):
 
 
 app.include_router(homepage_router)
+app.include_router(api_router)
 
 
 def custom_openapi():
@@ -50,10 +52,15 @@ def custom_openapi():
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title='CV Tracker API',
-        version='1.0.0',
-        description='API documentation for CV Tracker application',
-        routes=app.routes,
+        title='Documentação - TrackerCV',  # Título da documentação
+        version='1.0.0',  # Versão da API
+        description=(
+            'Esta é a documentação da API para o aplicativo TrackerCV, '
+            'uma aplicação desenvolvida para rastrear e gerenciar currículos. '
+            'Aqui você encontrará detalhes sobre os endpoints disponíveis, '
+            'os métodos HTTP suportados e os parâmetros necessários.'
+        ),
+        routes=app.routes,  # Rotas registradas na aplicação
     )
     app.openapi_schema = openapi_schema
     return app.openapi_schema
