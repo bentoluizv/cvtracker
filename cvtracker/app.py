@@ -2,9 +2,13 @@ import os
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from cvtracker.settings import get_settings
+
+settings = get_settings()
 
 app = FastAPI()
 
@@ -16,17 +20,35 @@ app.mount(
 
 templates = Jinja2Templates(directory='templates')
 
-homepage_router = APIRouter(tags=['Pages'])
+pages_router = APIRouter(tags=['Pages'])
 api_router = APIRouter(prefix='/api/v1', tags=['API'])
 
 
-@homepage_router.get('/', response_class=HTMLResponse)
+@pages_router.get('/', response_class=HTMLResponse)
 async def index(request: Request):
     """
     Serve a página principal do projeto, retorna um HTML Response.
 
     """
     return templates.TemplateResponse('index.html', {'request': request})
+
+
+@api_router.get('/', response_class=JSONResponse)
+async def api_index():
+    """
+    Página inicial da API, retorna um JSON Response.
+    Essa rota pode ser usada para verificar se a API está funcionando
+    corretamente, seu status e outras informações relevantes.
+
+    """
+    return JSONResponse({
+        'description': 'API para o aplicativo TrackerCV',
+        'version': settings.API_VERSION,
+        'api': '/api/v1',
+        'docs': '/docs',
+        'redoc': '/redoc',
+        'env': settings.ENVIROMENT,
+    })
 
 
 # @app.get('/todos', response_class=HTMLResponse)
@@ -43,7 +65,7 @@ async def index(request: Request):
 #     return JSONResponse(jsonable_todos)
 
 
-app.include_router(homepage_router)
+app.include_router(pages_router)
 app.include_router(api_router)
 
 
