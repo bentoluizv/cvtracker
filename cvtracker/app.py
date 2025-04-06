@@ -2,9 +2,13 @@ import os
 
 from fastapi import APIRouter, FastAPI, Request
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+
+from cvtracker.settings import get_settings
+
+settings = get_settings()
 
 app = FastAPI()
 
@@ -16,16 +20,35 @@ app.mount(
 
 templates = Jinja2Templates(directory='templates')
 
-homepage_router = APIRouter(tags=['Tracker API'])
+pages_router = APIRouter(tags=['Pages'])
+api_router = APIRouter(prefix='/api/v1', tags=['API'])
 
 
-@homepage_router.get('/', response_class=HTMLResponse)
+@pages_router.get('/', response_class=HTMLResponse)
 async def index(request: Request):
     """
     Serve a página principal do projeto, retorna um HTML Response.
 
     """
     return templates.TemplateResponse('index.html', {'request': request})
+
+
+@api_router.get('/', response_class=JSONResponse)
+async def api_index():
+    """
+    Página inicial da API, retorna um JSON Response.
+    Essa rota pode ser usada para verificar se a API está funcionando
+    corretamente, seu status e outras informações relevantes.
+
+    """
+    return JSONResponse({
+        'description': 'API para o aplicativo TrackerCV',
+        'version': settings.API_VERSION,
+        'api': '/api/v1',
+        'docs': '/docs',
+        'redoc': '/redoc',
+        'env': settings.ENVIROMENT,
+    })
 
 
 # @app.get('/todos', response_class=HTMLResponse)
@@ -42,7 +65,8 @@ async def index(request: Request):
 #     return JSONResponse(jsonable_todos)
 
 
-app.include_router(homepage_router)
+app.include_router(pages_router)
+app.include_router(api_router)
 
 
 def custom_openapi():
@@ -50,10 +74,15 @@ def custom_openapi():
         return app.openapi_schema
 
     openapi_schema = get_openapi(
-        title='CV Tracker API',
-        version='1.0.0',
-        description='API documentation for CV Tracker application',
-        routes=app.routes,
+        title='Documentação - TrackerCV',  # Título da documentação
+        version='1.0.0',  # Versão da API
+        description=(
+            'Esta é a documentação da API para o aplicativo TrackerCV, '
+            'uma aplicação desenvolvida para rastrear e gerenciar currículos. '
+            'Aqui você encontrará detalhes sobre os endpoints disponíveis, '
+            'os métodos HTTP suportados e os parâmetros necessários.'
+        ),
+        routes=app.routes,  # Rotas registradas na aplicação
     )
     app.openapi_schema = openapi_schema
     return app.openapi_schema
